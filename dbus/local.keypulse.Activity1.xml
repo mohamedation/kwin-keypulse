@@ -3,15 +3,14 @@
 <!--
   Privacy contract for kwin-keypulse:
 
-  NotifyKeyActivity carries no key codes, keysyms, text, modifiers, window
+  KeyActivity carries no key codes, keysyms, text, modifiers, window
   titles, or device identifiers. The KWin plugin must drop key identity before
-  calling this method.
+  emitting this signal.
 
-  Consumers (keyboard-sound apps, etc.) own the bus name and implement this
-  method. The plugin only fire-and-forgets the call.
+  The plugin owns the bus name and emits; any number of consumers may subscribe.
 -->
-<node name="/local/keypulse/Player">
+<node name="/local/keypulse/Emitter">
   <interface name="local.keypulse.Activity1">
-    <method name="NotifyKeyActivity"/>
+    <signal name="KeyActivity"/>
   </interface>
 </node>

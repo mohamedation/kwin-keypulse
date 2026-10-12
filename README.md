@@ -10,20 +10,20 @@ On Wayland, apps cannot safely monitor global key activity without special privi
 | --- | --- |
 | See `KeyboardKeyState::Pressed` | Send key codes, keysyms, or text |
 | Skip pulses while the screen is locked | Open `/dev/input` |
-| Call a zero-argument D-Bus method | Steal / grab the keyboard |
+| Emit a zero-argument D-Bus signal | Steal / grab the keyboard |
 
 ## D-Bus contract
 
 | Field | Value |
 | --- | --- |
-| Bus name (owned by consumer) | `local.keypulse.Player` |
-| Object path | `/local/keypulse/Player` |
+| Bus name (owned by plugin) | `local.keypulse.Emitter` |
+| Object path | `/local/keypulse/Emitter` |
 | Interface | `local.keypulse.Activity1` |
-| Method | `NotifyKeyActivity()` — **no arguments** |
+| Signal | `KeyActivity()` — **no arguments** |
 
 Introspection: [`dbus/local.keypulse.Activity1.xml`](dbus/local.keypulse.Activity1.xml).
 
-The plugin fire-and-forgets the method call. If no player is running, nothing happens.
+The plugin emits a session-bus signal. Any number of apps can subscribe; if nobody is listening, nothing happens.
 
 ## Build and install (user-local, no root)
 
@@ -50,19 +50,24 @@ journalctl --user -b | rg -i 'kwin-keypulse' | tail
 
 ## Test without a full consumer
 
-Any process that owns the player name works. Example with `dbus-monitor` + a one-shot stub is overkill; easiest check after a consumer is running:
+Watch the signal while typing:
 
 ```bash
-# temporarily expose a no-op sink and watch bus traffic:
-dbus-monitor --session "destination='local.keypulse.Player'"
+dbus-monitor --session "type='signal',sender='local.keypulse.Emitter',interface='local.keypulse.Activity1',member='KeyActivity'"
+```
+
+Confirm the plugin owns the name:
+
+```bash
+busctl --user status local.keypulse.Emitter
 ```
 
 ## Using it from another project
 
 1. Install this plugin for the user’s Plasma session.
-2. In your app, claim `local.keypulse.Player` on the session bus.
-3. Export `local.keypulse.Activity1.NotifyKeyActivity` at `/local/keypulse/Player`.
-4. On each call, play a sound / haptic / etc. Do not expect key identity — there is none.
+2. Subscribe to `local.keypulse.Activity1.KeyActivity` from sender `local.keypulse.Emitter` (path `/local/keypulse/Emitter`).
+3. On each signal, play a sound / haptic / etc. Do not expect key identity — there is none.
+4. Multiple apps may subscribe at once; none need to own a bus name.
 
 
 ## Privacy

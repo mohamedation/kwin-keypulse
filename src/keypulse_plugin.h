@@ -16,8 +16,8 @@ struct KeyboardKeyEvent;
 /**
  * Passive KWin input spy that reports key-down activity without exposing key identity.
  *
- * Only KeyboardKeyState::Pressed is forwarded. Key codes, text, and modifiers are
- * never read into D-Bus messages or logs.
+ * Only KeyboardKeyState::Pressed is forwarded as a D-Bus signal. Key codes, text,
+ * and modifiers are never read into D-Bus messages or logs.
  */
 class KeypulsePlugin : public Plugin, public InputEventSpy
 {

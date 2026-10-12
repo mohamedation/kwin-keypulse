@@ -19,19 +19,25 @@ namespace KWin
 
 static void notifyListeners()
 {
-    // Fire-and-forget method call. Any app that owns local.keypulse.Player can react.
-    // No arguments: key identity must never leave this process.
-    const QDBusMessage message = QDBusMessage::createMethodCall(
-        QStringLiteral("local.keypulse.Player"),
-        QStringLiteral("/local/keypulse/Player"),
+    // Broadcast to every subscriber. No arguments: key identity must never leave this process.
+    const QDBusMessage message = QDBusMessage::createSignal(
+        QStringLiteral("/local/keypulse/Emitter"),
         QStringLiteral("local.keypulse.Activity1"),
-        QStringLiteral("NotifyKeyActivity"));
+        QStringLiteral("KeyActivity"));
     QDBusConnection::sessionBus().send(message);
 }
 
 KeypulsePlugin::KeypulsePlugin()
 {
-    qInfo() << "kwin-keypulse loaded (anonymized key-down pulses only)";
+    QDBusConnection bus = QDBusConnection::sessionBus();
+    if (!bus.registerService(QStringLiteral("local.keypulse.Emitter"))) {
+        qWarning() << "kwin-keypulse: failed to claim local.keypulse.Emitter:"
+                    << bus.lastError().message();
+    } else {
+        qInfo() << "kwin-keypulse loaded (emitting anonymized key-down pulses on"
+                << "local.keypulse.Emitter)";
+    }
+
     input()->installInputEventSpy(this);
 }
 
