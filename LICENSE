@@ -1,0 +1,7 @@
+This project uses SPDX license identifiers on source files.
+
+- Plugin code: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted-GPL
+  (compatible with linking to KWin)
+- Build/metadata scaffolding: CC0-1.0 where marked
+
+When packaging, treat the binary KWin plugin as GPL-compatible with KWin.

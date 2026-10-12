@@ -1,0 +1,16 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "Keypulse contributors"
+            }
+        ],
+        "Category": "Utilities",
+        "Description": "Emits anonymized key-down pulses over D-Bus for apps like keyboard-sound players. Never sends key codes or typed text.",
+        "EnabledByDefault": true,
+        "Id": "keypulse",
+        "License": "GPL",
+        "Name": "Keypulse",
+        "Version": "0.1.0"
+    }
+}
