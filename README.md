@@ -1,6 +1,6 @@
 # kwin-keypulse
 
-A small Plasma 6 / KWin plugin that turns real typing into **anonymized key-down pulses** over D-Bus. It is not tied to any one app: keyboard-sound tools (e.g. Keychime), haptics helpers, or accessibility add-ons can all consume the same contract.
+A small Plasma 6 / KWin plugin that turns real typing into **anonymized key-down pulses** over D-Bus. It is not tied to any one app: keyboard-sound tools, haptics helpers, or accessibility add-ons can all consume the same contract.
 
 ## Why this exists
 
@@ -11,7 +11,6 @@ On Wayland, apps cannot safely monitor global key activity without special privi
 | See `KeyboardKeyState::Pressed` | Send key codes, keysyms, or text |
 | Skip pulses while the screen is locked | Open `/dev/input` |
 | Call a zero-argument D-Bus method | Steal / grab the keyboard |
-| Work for any consumer of the contract | Depend on Keychime |
 
 ## D-Bus contract
 
@@ -54,8 +53,7 @@ journalctl --user -b | rg -i 'kwin-keypulse' | tail
 Any process that owns the player name works. Example with `dbus-monitor` + a one-shot stub is overkill; easiest check after a consumer is running:
 
 ```bash
-# In your player app (Keychime: cargo run -- listen-kwin), then type.
-# Or temporarily expose a no-op sink and watch bus traffic:
+# temporarily expose a no-op sink and watch bus traffic:
 dbus-monitor --session "destination='local.keypulse.Player'"
 ```
 
@@ -66,7 +64,6 @@ dbus-monitor --session "destination='local.keypulse.Player'"
 3. Export `local.keypulse.Activity1.NotifyKeyActivity` at `/local/keypulse/Player`.
 4. On each call, play a sound / haptic / etc. Do not expect key identity — there is none.
 
-Example consumer: sibling project `keychime-starter` (`listen-kwin` command).
 
 ## Privacy
 
